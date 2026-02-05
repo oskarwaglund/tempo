@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Tempo</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+
+    .name {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    .temp {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .time {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Tempo</h1>
+  <h2>Current temperature at home 🔥🚀</h2>
+  <div id="grid" class="grid"></div>
+
+  <h2 style="margin-top: 3rem;">Last Hour 📈</h2>
+  <canvas id="chart" height="100"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
