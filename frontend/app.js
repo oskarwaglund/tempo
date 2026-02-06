@@ -94,4 +94,4 @@ loadHistory();
 setInterval(() => {
   loadTemps();
   loadHistory();
-}, 10000);
+}, 60000);
