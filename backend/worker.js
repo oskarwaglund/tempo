@@ -32,6 +32,8 @@ export default {
                 return new Response("Bad Request: invalid minutes", { status: 400 });
             }
 
+            const cutoff = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+
             const result = await env.tempo_db_binding
                 .prepare(`
                     SELECT
@@ -41,10 +43,10 @@ export default {
                         r.timestamp
                     FROM Readings r
                     JOIN Devices d ON d.id = r.deviceId
-                    WHERE r.timestamp >= datetime('now', '-' || ?1 || ' minutes')
+                    WHERE r.timestamp >= ?1
                     ORDER BY r.timestamp
                 `)
-                .bind(minutes)
+                .bind(cutoff)
                 .all();
 
             return jsonResponse(result.results);
