@@ -6,16 +6,15 @@ class ConfigShell
 {
 public:
     void Initialize();
+
 private:
     void ConfigMode();
-    
+
     void PrintHelp();
 
     String AwaitCommand();
     void ProcessCommand(String command, bool &exitRequested);
     bool IsValidChar(char c);
-
-    void ShowCurrentConfig();
 
     static constexpr char C_HELP = 'h';
     static constexpr char C_QUIT = 'q';

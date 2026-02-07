@@ -1,25 +1,6 @@
-#include <ESP8266WiFi.h> 
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include "ApiClient.h"
-
-void ApiClient::Connect(String ssid, String pw)
-{
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid.c_str(), pw.c_str());
-    Serial.printf("Connecting to %s:%s...\n", ssid.c_str(), pw.c_str());
-    
-    while(WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.print(".");
-    }
-    Serial.println();
-
-    Serial.println("Connected!");
-    Serial.print("Local IP address is ");
-    Serial.println(WiFi.localIP());
-}
 
 void ApiClient::Config(String deviceId, String apiUrl, String apiKey)
 {
@@ -30,7 +11,6 @@ void ApiClient::Config(String deviceId, String apiUrl, String apiKey)
 
 bool ApiClient::PostTemperature(float temperature)
 {
-    Serial.println("Posting temperature...");
     WiFiClientSecure client;
     client.setInsecure();
 
@@ -50,16 +30,15 @@ bool ApiClient::PostTemperature(float temperature)
     body += String(temperature, 2);
     body += "}";
 
-    Serial.printf("Posting %u bytes...\n", body.length());
+    Serial.print("Request body: ");
     Serial.println(body);
 
     int httpCode = https.POST(body);
     if (httpCode > 0)
     {
-        Serial.printf("HTTP status: %d\n", httpCode);
-
         String responseBody = https.getString();
-        Serial.println("Response body:");
+        Serial.printf("Got HTTP code %d\n", httpCode);
+        Serial.print("Response body: ");
         Serial.println(responseBody);
     }
     else
@@ -68,5 +47,5 @@ bool ApiClient::PostTemperature(float temperature)
     }
     https.end();
 
-    return (httpCode == 200);
+    return httpCode == 200;
 }

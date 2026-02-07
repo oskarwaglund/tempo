@@ -4,18 +4,37 @@
 
 float TempSensor::GetTemperature()
 {
-    const int N_READINGS = 10;
-    float temperature = 0;
-    for(int i = 0; i < 10; i++)
+    if(!_hasValidData) return 0;
+
+    float result = 0;
+    for (int i = 0; i < nStoredReadings; i++)
     {
-        temperature += Read();
-        delay(10);
+        result += _lastReads[i];
+        Serial.println(_lastReads[i]);
     }
-    temperature /= N_READINGS;
-    return temperature;
+    result /= nStoredReadings;
+    return result;
 }
 
-float TempSensor::Read()
+void TempSensor::Read()
+{
+    float currentTemp = CalculateTempFromAdc();
+    if(_hasValidData)
+    {
+        _lastReads[_readIndex++] = currentTemp;
+        _readIndex %= nStoredReadings;
+    }
+    else
+    {
+        for(int i = 0; i < nStoredReadings; i++)
+        {
+            _lastReads[i] = currentTemp;
+        }
+        _hasValidData = true;
+    }
+}
+
+float TempSensor::CalculateTempFromAdc()
 {
     const float ADC_MAX_VOLTAGE = 3.0;
     const int ADC_STEPS = 1023;
@@ -28,6 +47,10 @@ float TempSensor::Read()
     const float BASE_VOLTAGE = 0.75; //V
     const float SCALE_FACTOR = 100; //°C/V
 
-    float temperature = BASE_TEMPERATURE + (voltage-BASE_VOLTAGE)*SCALE_FACTOR;
-    return temperature;
+    return BASE_TEMPERATURE + (voltage-BASE_VOLTAGE)*SCALE_FACTOR;
+}
+
+bool TempSensor::HasValidData()
+{
+    return _hasValidData;
 }

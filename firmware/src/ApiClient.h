@@ -4,7 +4,6 @@
 class ApiClient
 {
 public:
-    void Connect(String ssid, String pw);
     void Config(String deviceId, String apiUrl, String apiKey);
     bool PostTemperature(float temperature);
 

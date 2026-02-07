@@ -52,7 +52,6 @@ String ConfigStorage::ReadItem(StorageItem item)
     int itemAddress;
     int itemSize;
     GetAddressAndSizeOf(item, itemAddress, itemSize);
-    Serial.printf("Trying to read from addr %i (%i)...\n", itemAddress, itemSize);
 
     String value;
     value.reserve(itemSize);

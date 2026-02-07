@@ -1,16 +1,29 @@
 #include <Arduino.h>
+#include <ESP8266WiFi.h>
 
 #include "TempSensor.h"
 #include "ConfigShell.h"
 #include "ConfigStorage.h"
 #include "ApiClient.h"
 
-ApiClient client;
+ApiClient apiClient;
+TempSensor temp;
+
+bool schedulingSetupDone = false;
+
+unsigned long readLast;
+unsigned long readPeriod = 10000; //ms
+
+unsigned long postLast;
+unsigned long postPeriod = 60000; //ms
+unsigned long postOffset = 5000;
+
+void setupWifi(ConfigStorage &config);
+void setupApiClient(ConfigStorage &config);
 
 void setup()
 {
     Serial.begin(115200);
-    delay(300);
 
     ConfigStorage::Initialize();
 
@@ -18,33 +31,68 @@ void setup()
     configShell.Initialize();
 
     ConfigStorage config;
+    setupWifi(config);
+    setupApiClient(config);
 
-    String ssid = config.ReadItem(WIFI_SSID);
-    String pw = config.ReadItem(WIFI_PW);
-    String deviceId = config.ReadItem(DEVICE_ID);
-    String apiKey = config.ReadItem(API_KEY);
-    String apiUrl = config.ReadItem(API_URL);
-
-    client.Connect(ssid, pw);
-    client.Config(deviceId, apiUrl, apiKey);
-
-    Serial.println();
     Serial.println("Starting main loop...");
 }
-
-
-const unsigned long READ_PERIOD_MS = 10000;
-unsigned long nextReadEvent = 0;
 
 void loop()
 {
     unsigned long now = millis();
-    if ((long)(now - nextReadEvent) >= 0) {
-        nextReadEvent = now + READ_PERIOD_MS;
-        
-        TempSensor temp;
-        float temperature = temp.GetTemperature();
-        client.PostTemperature(temperature);
+    if(!schedulingSetupDone)
+    {
+        readLast = now;
+        postLast = now + postOffset - postPeriod;
+        schedulingSetupDone = true;
     }
+    
+    if(now - postLast >= postPeriod)
+    {
+        if(temp.HasValidData())
+        {
+            float temperature = temp.GetTemperature();
+            apiClient.PostTemperature(temperature);
+        }
+        postLast = now;
+    }
+
+    if(now - readLast >= readPeriod)
+    {
+        temp.Read();
+        Serial.printf("Temp: %.2f\n", temp.GetTemperature());
+        readLast = now;
+    }
+
     delay(1);
+}
+
+void setupWifi(ConfigStorage &config)
+{
+    String ssid = config.ReadItem(WIFI_SSID);
+    String pw = config.ReadItem(WIFI_PW);
+
+    WiFi.mode(WIFI_STA);
+    WiFi.setPhyMode(WIFI_PHY_MODE_11G);
+    WiFi.begin(ssid, pw);
+    Serial.printf("Connecting to %s:%s...\n", ssid.c_str(), pw.c_str());
+    
+    while(WiFi.status() != WL_CONNECTED)
+    {
+        delay(100);
+        yield();
+    }
+    Serial.println();
+
+    Serial.println("Connected!");
+    Serial.print("Local IP address is ");
+    Serial.println(WiFi.localIP());
+}
+
+void setupApiClient(ConfigStorage &config)
+{
+    String deviceId = config.ReadItem(DEVICE_ID);
+    String apiKey = config.ReadItem(API_KEY);
+    String apiUrl = config.ReadItem(API_URL);
+    apiClient.Config(deviceId, apiUrl, apiKey);
 }
