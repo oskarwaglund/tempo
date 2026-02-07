@@ -35,3 +35,5 @@ The backend runs on CloudFlare as a simple .js worker. See the backend/ director
 
 ## Frontend
 The frontend is simple HTML/CSS + JavaScript. It shows current temperature and temperature over time.
+
+![Frontend](resources/frontend.jpg)
