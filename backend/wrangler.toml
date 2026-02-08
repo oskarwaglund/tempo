@@ -1,0 +1,8 @@
+name = "tempoapi"
+main = "worker.js"
+compatibility_date = "2025-10-08"
+
+[[d1_databases]]
+binding = "tempo_db_binding"
+database_name = "tempo_db"
+database_id = "0f9a01ac-5f2e-40df-925d-b02aa4e88221"
