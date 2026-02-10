@@ -1,6 +1,10 @@
-const API_URL = "https://tempoapi.wglnd.workers.dev/v1/devices/current";
-const HISTORY_URL =
-  "https://tempoapi.wglnd.workers.dev/v1/devices/history?minutes=60";
+const API_BASE =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:8787"
+    : "https://tempoapi.wglnd.workers.dev";
+
+const API_URL = API_BASE + "/v1/devices/current";
+const HISTORY_URL = API_BASE + "/v1/devices/history?minutes=60";
 
 let chart;
 
@@ -15,11 +19,15 @@ async function loadTemps() {
     const card = document.createElement("div");
     card.className = "card";
 
+    const now = new Date(Date.now())
+    const latest = new Date(device.timestamp);
+    const seconds = Math.round((now.getTime() - latest.getTime()) / 1000);
+    const timeDiffString = seconds > 300 ? `>300` : `${seconds}`;
     card.innerHTML = `
       <div class="name">${device.name}</div>
       <div class="temp">${device.temperature.toFixed(1)} °C</div>
       <div class="time">
-        ${new Date(device.timestamp).toLocaleTimeString()}
+        ${latest.toLocaleTimeString()} (${timeDiffString}s ago)
       </div>
     `;
 
