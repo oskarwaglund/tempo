@@ -12,10 +12,10 @@ TempSensor temp;
 bool schedulingSetupDone = false;
 
 unsigned long readLast;
-unsigned long readPeriod = 10000; //ms
+unsigned long readPeriod = 10000; // ms
 
 unsigned long postLast;
-unsigned long postPeriod = 60000; //ms
+unsigned long postPeriod = 60000; // ms
 unsigned long postOffset = 5000;
 
 void setupWifi(ConfigStorage &config);
@@ -40,28 +40,28 @@ void setup()
 void loop()
 {
     unsigned long now = millis();
-    if(!schedulingSetupDone)
+    if (!schedulingSetupDone)
     {
         readLast = now;
         postLast = now + postOffset - postPeriod;
         schedulingSetupDone = true;
     }
-    
-    if(now - postLast >= postPeriod)
+
+    if (now - postLast >= postPeriod)
     {
-        if(temp.HasValidData())
+        postLast += postPeriod;
+        if (temp.HasValidData())
         {
             float temperature = temp.GetTemperature();
             apiClient.PostTemperature(temperature);
         }
-        postLast = now;
     }
 
-    if(now - readLast >= readPeriod)
+    if (now - readLast >= readPeriod)
     {
+        readLast += readPeriod;
         temp.Read();
         Serial.printf("Temp: %.2f\n", temp.GetTemperature());
-        readLast = now;
     }
 
     delay(1);
@@ -76,8 +76,8 @@ void setupWifi(ConfigStorage &config)
     WiFi.setPhyMode(WIFI_PHY_MODE_11G);
     WiFi.begin(ssid, pw);
     Serial.printf("Connecting to %s:%s...\n", ssid.c_str(), pw.c_str());
-    
-    while(WiFi.status() != WL_CONNECTED)
+
+    while (WiFi.status() != WL_CONNECTED)
     {
         delay(100);
         yield();
