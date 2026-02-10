@@ -12,3 +12,6 @@ CREATE TABLE IF NOT EXISTS Readings (
   timestamp TEXT NOT NULL,
   FOREIGN KEY (deviceId) REFERENCES Devices(id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_readings_timestamp_device ON Readings (timestamp, deviceId);
+CREATE INDEX IF NOT EXISTS idx_readings_device_timestamp_desc ON Readings (deviceId, timestamp DESC);
