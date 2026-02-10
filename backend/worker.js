@@ -2,6 +2,10 @@ export default {
     async fetch(request, env, ctx) {
         // Test GitHub push
         const url = new URL(request.url);
+        if (url.pathname === "/v1/test" && request.method === "GET") {
+            return jsonResponse("OK");
+        }
+
         if (url.pathname === "/v1/devices/current" && request.method === "GET") {
             const result = await env.tempo_db_binding
                 .prepare(`
