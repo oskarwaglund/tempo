@@ -24,7 +24,7 @@ async function loadTemps() {
     const seconds = Math.round((now.getTime() - latest.getTime()) / 1000);
     const timeDiffString = seconds > 300 ? `>300` : `${seconds}`;
     card.innerHTML = `
-      <div class="name">${device.name}</div>
+      <div class="name">${device.name} (${device.deviceId})</div>
       <div class="temp">${device.temperature.toFixed(1)} °C</div>
       <div class="time">
         ${latest.toLocaleTimeString()} (${timeDiffString}s ago)
